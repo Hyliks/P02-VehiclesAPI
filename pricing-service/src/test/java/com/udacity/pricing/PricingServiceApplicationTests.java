@@ -34,7 +34,7 @@ public class PricingServiceApplicationTests {
 
 	@Test
 	public void addPrice() {
-		Price price = new Price("USD",new BigDecimal(1.00),new Long(6));
+		Price price = new Price(new Long(6),"USD",new BigDecimal(1.00),new Long(6));
 		HttpEntity<Price> request = new HttpEntity<>(price);
 		ResponseEntity<Price> answer = this.restTemplate.postForEntity("http://localhost:" + port + "/prices/",request, Price.class);
 
@@ -46,7 +46,7 @@ public class PricingServiceApplicationTests {
 
 	@Test
 	public void getPrice() throws InterruptedException{
-		Price price = new Price("USD",new BigDecimal(1.00),new Long(6));
+		Price price = new Price(new Long(6),"USD",new BigDecimal(1.00),new Long(6));
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("X-COM-PERSIST", "true");
@@ -59,7 +59,7 @@ public class PricingServiceApplicationTests {
 		assertThat(answer.getBody().getCurrency(), is(price.getCurrency()));
 		assertThat(answer.getBody().getPrice(), is(price.getPrice()));
 
-		ResponseEntity<Price> response = this.restTemplate.getForEntity("http://localhost:" + port + "/prices/" + 1 + "/",Price.class);
+		ResponseEntity<Price> response = this.restTemplate.getForEntity("http://localhost:" + port + "/prices/" + price.getId() + "/",Price.class);
 		assertThat(response.getStatusCode(),equalTo(HttpStatus.OK));
 
 		assertThat(response.getBody(), notNullValue());
@@ -69,7 +69,7 @@ public class PricingServiceApplicationTests {
 
 	@Test
 	public void getPrices() {
-		Price price = new Price("USD",new BigDecimal(1.00),new Long(6));
+		Price price = new Price(new Long(6),"USD",new BigDecimal(1.00),new Long(6));
 
 		HttpHeaders headers = new HttpHeaders();
 		headers.set("X-COM-PERSIST", "true");
@@ -82,7 +82,7 @@ public class PricingServiceApplicationTests {
 		assertThat(answer.getBody().getCurrency(), is(price.getCurrency()));
 		assertThat(answer.getBody().getPrice(), is(price.getPrice()));
 
-		price = new Price("USD",new BigDecimal(200),new Long(7));
+		price = new Price(new Long(7),"USD",new BigDecimal(200),new Long(7));
 
 		headers = new HttpHeaders();
 		headers.set("X-COM-PERSIST", "true");

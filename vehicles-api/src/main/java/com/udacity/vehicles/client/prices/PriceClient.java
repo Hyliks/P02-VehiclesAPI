@@ -4,6 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import reactor.core.publisher.Mono;
+
+import java.math.BigDecimal;
 
 /**
  * Implements a class to interface with the Pricing Client for price data.
@@ -44,7 +47,29 @@ public class PriceClient {
 
         } catch (Exception e) {
             log.error("Unexpected error retrieving price for vehicle {}", vehicleId, e);
+
+            try {
+                Price priceToAdd = new Price();
+                priceToAdd.setId(vehicleId);
+                priceToAdd.setCurrency("USD");
+                priceToAdd.setPrice(new BigDecimal(Math.random()));
+                priceToAdd.setVehicleId(vehicleId);
+
+                Price price = client
+                        .post()
+                        .uri(uriBuilder -> uriBuilder
+                                .path("prices")
+                                .build()
+                        ).body(Mono.just(priceToAdd),Price.class)
+                        .retrieve().bodyToMono(Price.class).block();
+
+                return String.format("%s %s", price.getCurrency(), price.getPrice());
+            }catch (Exception ee) {
+                log.error("Unexpected error adding price for vehicle {}", vehicleId, ee);
+            }
         }
+
+
         return "(consult price)";
     }
 }
